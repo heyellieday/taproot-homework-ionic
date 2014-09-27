@@ -2,7 +2,11 @@
 
 angular.module('TaprootHomeworkIonic.controllers', [])
 
-.controller('MapCtrl', function($scope, $ionicLoading) {
+.controller('EventsCtrl', function($scope, Events, $rootScope) {
+  $rootScope.Events = new Events();
+})
+
+.controller('MapCtrl', function($scope, $ionicLoading, $rootScope, ENV) {
   $scope.mapCreated = function(map) {
     $scope.map = map;
   };
@@ -21,6 +25,7 @@ angular.module('TaprootHomeworkIonic.controllers', [])
     navigator.geolocation.getCurrentPosition(function (pos) {
       console.log('Got pos', pos);
       $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+      $rootScope.Events.loadEvents(pos.coords.latitude, pos.coords.longitude, $scope.map, ENV );
       $ionicLoading.hide();
     }, function (error) {
       alert('Unable to get location: ' + error.message);
