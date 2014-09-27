@@ -28,15 +28,25 @@ angular.module('TaprootHomeworkIonic.services', [])
 
     var url = ENV.apiEndpoint + 'events?callback=JSON_CALLBACK&lat='+ lat + '&long=' +long;
     $http.jsonp(url).success(function(data) {
+      var infowindow = new google.maps.InfoWindow();
+      var bounds = new google.maps.LatLngBounds();
       for (var i = 0; i < data.events.length; i++) {
         this.events.push(data.events[i]);
         var myLatlng = new google.maps.LatLng(this.events[i].venue.location.point.lat, this.events[i].venue.location.point.long);
         var marker = new google.maps.Marker({
             position: myLatlng,
-            title: this.events[i].title
         });
+        var events = this.events;
+        google.maps.event.addListener(marker, 'click', (function (marker, i) {
+            return function () {
+                infowindow.setContent("<p>Event Name: " + events[i].title +"</p><br>"+"<p>Date & Time: " + events[i].startDate +"</p><br>"+" <a href='http://google.com'>Call an Uber</a>");
+                infowindow.open(map, marker);
+            }
+        })(marker, i));
         marker.setMap(map);
+        bounds.extend(marker.position);
       }
+      map.fitBounds(bounds);
       console.log(this.events);
       this.busy = false;
     }.bind(this));
